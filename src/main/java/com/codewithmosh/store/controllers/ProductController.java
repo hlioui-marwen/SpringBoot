@@ -6,10 +6,8 @@ import com.codewithmosh.store.mappers.ProductMapper;
 import com.codewithmosh.store.repositories.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Set;
@@ -34,6 +32,22 @@ public class ProductController {
 
 
         return products.stream().map(productMapper::toDto).toList();
+    }
+
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<List<ProductDto>> getProduct(@PathVariable Byte categoryId) {
+        // ResponseEntity<List<ProductDto>>  because you’re returning both data and HTTP status information
+        List<Product> products;
+        products = productRepository.findByCategoryId(categoryId);
+
+        if (products.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        List<ProductDto> productDtos = products.stream().map(productMapper::toDto).toList();
+
+        return ResponseEntity.ok(productDtos);
+
     }
 
 }
